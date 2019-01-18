@@ -13,12 +13,14 @@
   $genreId = (int)$genreId;
 
   var_dump($genreId);
-  
+
   $sql2 = "
     SELECT
       tracks.Name,
       tracks.Composer
-    From tracks WHERE tracks.GenreId=" . $genreId;
+    From tracks WHERE tracks.GenreId=" . $genreId
+    . "
+    LIMIT 15";
 
   $statement2 = $pdo->prepare($sql2);
   $statement2->execute();
