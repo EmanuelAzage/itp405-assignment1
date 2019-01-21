@@ -1,36 +1,58 @@
 <?php
   $pdo = new PDO('sqlite:chinook.db');
 
-  $sql = "
-    SELECT genres.GenreId
-    From genres
-    WHERE genres.Name = :name";
+  if (isset($GET["genre"])){
 
-  $statement = $pdo->prepare($sql);
-  $statement->bindParam(':name', $_GET['genre'], PDO::PARAM_STR, strlen($_GET['genre']));
-  $statement->execute();
+    $sql = "
+      SELECT genres.GenreId
+      From genres
+      WHERE genres.Name = :name";
 
-  $genreIdObj = $statement->fetchAll(PDO::FETCH_OBJ);
-  $genreId = $genreIdObj[0]->GenreId;
+    $statement = $pdo->prepare($sql);
+    $statement->bindParam(':name', $_GET['genre'], PDO::PARAM_STR, strlen($_GET['genre']));
+    $statement->execute();
 
-  $sql2 = "
-    SELECT
-      tracks.Name,
-      tracks.UnitPrice,
-      albums.Title,
-      artists.artistId
-    From tracks
-    INNER JOIN albums
-    ON tracks.albumId = albums.albumId
-    INNER JOIN artists
-    ON albums.artistId = artists.artistId
-    WHERE tracks.GenreId = :genreId";
+    $genreIdObj = $statement->fetchAll(PDO::FETCH_OBJ);
+    $genreId = $genreIdObj[0]->GenreId;
 
-  $statement2 = $pdo->prepare($sql2);
-  $statement2->bindParam(':genreId', $genreId, PDO::PARAM_INT);
-  $statement2->execute();
+    $sql2 = "
+      SELECT
+        tracks.Name,
+        tracks.UnitPrice,
+        albums.Title,
+        artists.artistId
+      From tracks
+      INNER JOIN albums
+      ON tracks.albumId = albums.albumId
+      INNER JOIN artists
+      ON albums.artistId = artists.artistId
+      WHERE tracks.GenreId = :genreId";
 
-  $tracks = $statement2->fetchAll(PDO::FETCH_OBJ);
+    $statement2 = $pdo->prepare($sql2);
+    $statement2->bindParam(':genreId', $genreId, PDO::PARAM_INT);
+    $statement2->execute();
+
+    $tracks = $statement2->fetchAll(PDO::FETCH_OBJ);
+
+  }
+  else {
+    $sql = "
+      SELECT
+        tracks.Name,
+        tracks.UnitPrice,
+        albums.Title,
+        artists.artistId
+      From tracks
+      INNER JOIN albums
+      ON tracks.albumId = albums.albumId
+      INNER JOIN artists
+      ON albums.artistId = artists.artistId";
+
+    $statement = $pdo->prepare($sql);
+    $statement->execute();
+
+    $tracks = $statement->fetchAll(PDO::FETCH_OBJ);
+  }
 
 ?>
 <!DOCTYPE html>
